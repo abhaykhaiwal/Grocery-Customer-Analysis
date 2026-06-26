@@ -335,15 +335,11 @@ with tab2:
     )
     profile.columns = ['Segment','Customers','Avg 2yr Spend ($)',
                         'Avg Baskets','Avg Basket ($)','Avg Recency (days)','Churn Rate']
-    st.dataframe(
-        profile.style.format({
-            'Customers': '{:,}',
-            'Avg 2yr Spend ($)': '${:.0f}',
-            'Avg Basket ($)': '${:.2f}',
-            'Churn Rate': '{:.1%}',
-        }),
-        hide_index=True, use_container_width=True,
-    )
+    profile['Customers']        = profile['Customers'].apply(lambda x: f'{int(x):,}')
+    profile['Avg 2yr Spend ($)']= profile['Avg 2yr Spend ($)'].apply(lambda x: f'${x:.0f}')
+    profile['Avg Basket ($)']   = profile['Avg Basket ($)'].apply(lambda x: f'${x:.2f}')
+    profile['Churn Rate']       = profile['Churn Rate'].apply(lambda x: f'{x:.1%}')
+    st.dataframe(profile, hide_index=True, use_container_width=True)
 
     st.subheader("Recommended Action by Segment")
     action_df = pd.DataFrame({
@@ -429,20 +425,16 @@ with tab3:
         'Uplift $/wk','Total Uplift ($)','Mailer Cost ($)',
         'Revenue ROI','Net ROI (margin adj.)','p-value','Significant'
     ]
-    st.dataframe(
-        roi_display.style.format({
-            'Households': '{:,}',
-            'Pre $/wk': '${:.2f}',
-            'During $/wk': '${:.2f}',
-            'Uplift $/wk': '${:+.2f}',
-            'Total Uplift ($)': '${:,.0f}',
-            'Mailer Cost ($)': '${:,.0f}',
-            'Revenue ROI': '{:.2f}x',
-            'Net ROI (margin adj.)': '{:.2f}x',
-            'p-value': '{:.4f}',
-        }).background_gradient(subset=['Revenue ROI'], cmap='Greens'),
-        hide_index=True, use_container_width=True,
-    )
+    roi_display['Households']          = roi_display['Households'].apply(lambda x: f'{int(x):,}')
+    roi_display['Pre $/wk']            = roi_display['Pre $/wk'].apply(lambda x: f'${x:.2f}')
+    roi_display['During $/wk']         = roi_display['During $/wk'].apply(lambda x: f'${x:.2f}')
+    roi_display['Uplift $/wk']         = roi_display['Uplift $/wk'].apply(lambda x: f'${x:+.2f}')
+    roi_display['Total Uplift ($)']    = roi_display['Total Uplift ($)'].apply(lambda x: f'${x:,.0f}')
+    roi_display['Mailer Cost ($)']     = roi_display['Mailer Cost ($)'].apply(lambda x: f'${x:,.0f}')
+    roi_display['Revenue ROI']         = roi_display['Revenue ROI'].apply(lambda x: f'{x:.2f}x')
+    roi_display['Net ROI (margin adj.)'] = roi_display['Net ROI (margin adj.)'].apply(lambda x: f'{x:.2f}x')
+    roi_display['p-value']             = roi_display['p-value'].apply(lambda x: f'{x:.4f}')
+    st.dataframe(roi_display, hide_index=True, use_container_width=True)
 
     st.markdown(
         "_Mailer costs: TypeA=$1.50, TypeB=$0.80, TypeC=$0.50 per household "
@@ -546,14 +538,10 @@ with tab4:
         ].copy()
     )
     top20.columns = ['Household','Predicted CLV ($)','Actual Y2 Spend ($)','Abs Error ($)','In Test Set']
-    st.dataframe(
-        top20.style.format({
-            'Predicted CLV ($)':   '${:.0f}',
-            'Actual Y2 Spend ($)': '${:.0f}',
-            'Abs Error ($)':       '${:.0f}',
-        }).background_gradient(subset=['Predicted CLV ($)'], cmap='Greens'),
-        hide_index=True, use_container_width=True,
-    )
+    top20['Predicted CLV ($)']   = top20['Predicted CLV ($)'].apply(lambda x: f'${x:.0f}')
+    top20['Actual Y2 Spend ($)'] = top20['Actual Y2 Spend ($)'].apply(lambda x: f'${x:.0f}')
+    top20['Abs Error ($)']       = top20['Abs Error ($)'].apply(lambda x: f'${x:.0f}')
+    st.dataframe(top20, hide_index=True, use_container_width=True)
 
     with st.expander("Model methodology"):
         n_folds = int(clv_m.get('n_folds', 5))
@@ -664,13 +652,9 @@ with tab5:
         .head(20)[['household_key','churn_probability','predicted_clv','rfm_segment']]
     )
     high_risk_tbl.columns = ['Household','Churn Prob','Predicted CLV ($)','Segment']
-    st.dataframe(
-        high_risk_tbl.style.format({
-            'Churn Prob': '{:.1%}',
-            'Predicted CLV ($)': '${:.2f}',
-        }).background_gradient(subset=['Churn Prob'], cmap='Reds'),
-        hide_index=True, use_container_width=True,
-    )
+    high_risk_tbl['Churn Prob']      = high_risk_tbl['Churn Prob'].apply(lambda x: f'{x:.1%}')
+    high_risk_tbl['Predicted CLV ($)'] = high_risk_tbl['Predicted CLV ($)'].apply(lambda x: f'${x:.2f}')
+    st.dataframe(high_risk_tbl, hide_index=True, use_container_width=True)
 
     st.subheader("Re-engagement Economics")
     col_a, col_b = st.columns(2)
