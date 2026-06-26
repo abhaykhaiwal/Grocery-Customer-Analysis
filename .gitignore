@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.db
+.env
+.claude/
+
+# Large data files — download from Kaggle (Dunnhumby Complete Journey)
+transaction_data.csv
+causal_data.csv
+
+# Generated static plots (dashboard renders these live via Plotly)
+fig*.png
