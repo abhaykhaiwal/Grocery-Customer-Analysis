@@ -12,16 +12,22 @@ load_dotenv(Path(__file__).parent / '.env', override=True)
 
 import psycopg2
 
+def _db_config() -> dict:
+    """Return connection params — Streamlit secrets take priority over .env."""
+    try:
+        import streamlit as st
+        s = st.secrets
+        return dict(host=s['DB_HOST'], port=int(s['DB_PORT']),
+                    dbname=s['DB_NAME'], user=s['DB_USER'],
+                    password=s['DB_PASSWORD'])
+    except Exception:
+        return dict(host=os.environ['DB_HOST'], port=int(os.environ['DB_PORT']),
+                    dbname=os.environ['DB_NAME'], user=os.environ['DB_USER'],
+                    password=os.environ['DB_PASSWORD'])
+
 def get_engine():
     def _connect():
-        return psycopg2.connect(
-            host     = os.environ['DB_HOST'],
-            port     = int(os.environ['DB_PORT']),
-            dbname   = os.environ['DB_NAME'],
-            user     = os.environ['DB_USER'],
-            password = os.environ['DB_PASSWORD'],
-            sslmode  = 'require',
-        )
+        return psycopg2.connect(**_db_config(), sslmode='require')
     return create_engine('postgresql+psycopg2://', creator=_connect)
 
 
